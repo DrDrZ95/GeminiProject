@@ -49,12 +49,27 @@ export const translations = {
     modeProject: "Project Assistance",
     modeCompany: "About the Company",
 
-    // Placeholders
+    // Placeholders - Optimized & Detailed
     placeholderGeneral: "Ask anything...",
-    placeholderWorkReport: "You can: Help me send today's work content to the employee system",
-    placeholderOA: "You can: Guide me through the reimbursement or leave application process",
-    placeholderProject: "You can: Create a timeline or manage tasks for the upcoming sprint",
-    placeholderCompany: "You can: Ask about company culture, history, or department structure"
+    placeholderWorkReport: "Draft a structured daily report summarizing key achievements, code commits, and blockers for the engineering team sync...",
+    placeholderOA: "Guide me through the internal reimbursement process for travel expenses, including category selection and approval chain...",
+    placeholderProject: "Generate a Gantt chart timeline for the Q3 migration project, outlining milestones, dependencies, and resource allocation...",
+    placeholderCompany: "Retrieve the latest organizational structure for the Product Design department and summarize the key leadership hierarchy...",
+
+    // Login
+    welcomeBack: "Welcome back",
+    loginSubtitle: "Sign in to your internal workspace",
+    emailOrId: "Email or Employee ID",
+    password: "Password",
+    phoneNumber: "Phone Number",
+    continue: "Continue",
+    orContinueWith: "Or continue with",
+    signInWithGoogle: "Sign in with Google",
+    signInWithOutlook: "Sign in with Outlook",
+    usePhone: "Use Phone Number",
+    useEmail: "Use Email / ID",
+    forgotPassword: "Forgot password?",
+    rememberMe: "Remember me"
   },
   zh: {
     newChat: "新对话",
@@ -105,12 +120,27 @@ export const translations = {
     modeProject: "项目协助",
     modeCompany: "关于公司",
 
-    // Placeholders
+    // Placeholders - Optimized & Detailed
     placeholderGeneral: "问点什么...",
-    placeholderWorkReport: "您可以：帮我把今天的工作内容发送到员工系统",
-    placeholderOA: "您可以：引导我完成报销或请假申请流程",
-    placeholderProject: "您可以：为即将到来的冲刺创建时间表或管理任务",
-    placeholderCompany: "您可以：询问关于公司文化、历史或部门结构的信息"
+    placeholderWorkReport: "起草一份结构化的日报，总结关键成就、代码提交记录以及遇到的阻碍，用于工程团队同步...",
+    placeholderOA: "引导我完成差旅费用的内部报销流程，包括类别选择和审批链条说明...",
+    placeholderProject: "为Q3迁移项目生成甘特图时间表，概述里程碑、依赖关系和资源分配...",
+    placeholderCompany: "检索产品设计部门的最新组织架构，并总结关键的领导层级体系...",
+
+    // Login
+    welcomeBack: "欢迎回来",
+    loginSubtitle: "登录您的内部工作区",
+    emailOrId: "邮箱或员工 ID",
+    password: "密码",
+    phoneNumber: "手机号码",
+    continue: "继续",
+    orContinueWith: "或其他方式",
+    signInWithGoogle: "使用 Google 登录",
+    signInWithOutlook: "使用 Outlook 登录",
+    usePhone: "使用手机号登录",
+    useEmail: "使用邮箱/ID登录",
+    forgotPassword: "忘记密码？",
+    rememberMe: "记住我"
   }
 };
 

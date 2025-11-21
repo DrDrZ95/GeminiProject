@@ -51,7 +51,27 @@ export type ModelType = 'kimi' | 'deepseek' | 'gpt-oss';
 export type ModalType = 'upgrade' | 'account' | 'help' | 'settings' | null;
 export type InputMode = 'general' | 'work_report' | 'oa_workflow' | 'project' | 'company';
 
+// API Types
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  role?: string;
+}
+
+export interface LoginRequest {
+  email?: string;
+  phone?: string;
+  password?: string;
+  provider?: 'google' | 'outlook' | 'credentials';
+}
+
 export interface AppState {
+  // Auth State
+  isAuthenticated: boolean;
+  user: User | null;
+
   // Chat State
   sessions: ChatSession[];
   groups: Group[];
@@ -74,6 +94,9 @@ export interface AppState {
   activeModal: ModalType;
   
   // Actions
+  login: (credentials: LoginRequest) => Promise<void>;
+  logout: () => void;
+
   setInput: (input: string) => void;
   addAttachment: (file: File) => Promise<void>;
   removeAttachment: (id: string) => void;

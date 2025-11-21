@@ -1,9 +1,10 @@
 
 import { create } from 'zustand';
-import { AppState, Message, Role, ChatSession, Attachment } from './types';
+import { AppState, Message, Role, ChatSession, Attachment, LoginRequest } from './types';
 import { v4 as uuidv4 } from 'uuid';
 import { generateNews, shouldFetchNews } from './services/news';
 import { MOCK_SESSIONS } from './data/mockData';
+import { authApi } from './services/api';
 
 const STORAGE_KEY = 'grok-app-storage-v1';
 
@@ -24,6 +25,10 @@ const loadState = (): Partial<AppState> => {
       if (!parsed.sessions || parsed.sessions.length <= 1 && parsed.sessions[0].messages.length === 0) {
           return { ...parsed, sessions: MOCK_SESSIONS, currentSessionId: MOCK_SESSIONS[0].id };
       }
+      // Default isAuthenticated to true if missing (backward compatibility)
+      if (parsed.isAuthenticated === undefined) {
+        parsed.isAuthenticated = true;
+      }
       return parsed;
     }
   } catch (e) {
@@ -32,7 +37,8 @@ const loadState = (): Partial<AppState> => {
   // Default Fallback: Load Mock Data
   return {
       sessions: MOCK_SESSIONS,
-      currentSessionId: MOCK_SESSIONS[0].id
+      currentSessionId: MOCK_SESSIONS[0].id,
+      isAuthenticated: true // Default to true as per requirements
   };
 };
 
@@ -40,6 +46,8 @@ const initialState = loadState();
 
 export const useStore = create<AppState>((set, get) => {
   return {
+    isAuthenticated: initialState.isAuthenticated ?? true,
+    user: initialState.user || null,
     sessions: initialState.sessions || MOCK_SESSIONS,
     groups: initialState.groups || [],
     currentSessionId: initialState.currentSessionId || MOCK_SESSIONS[0].id,
@@ -56,6 +64,21 @@ export const useStore = create<AppState>((set, get) => {
     
     news: initialState.news || [],
     lastNewsFetch: initialState.lastNewsFetch || 0,
+
+    login: async (credentials: LoginRequest) => {
+      try {
+        const user = await authApi.login(credentials);
+        set({ isAuthenticated: true, user });
+      } catch (error) {
+        console.error("Login failed", error);
+        throw error; // Re-throw for UI to handle
+      }
+    },
+    
+    logout: async () => {
+      await authApi.logout();
+      set({ isAuthenticated: false, user: null });
+    },
 
     setInput: (input) => set({ input }),
 
@@ -236,6 +259,8 @@ export const useStore = create<AppState>((set, get) => {
 // Subscribe to store changes and persist to localStorage
 useStore.subscribe((state) => {
   const stateToSave: Partial<AppState> = {
+    isAuthenticated: state.isAuthenticated, // Persist Auth State
+    user: state.user,
     sessions: state.sessions,
     groups: state.groups,
     currentSessionId: state.currentSessionId,

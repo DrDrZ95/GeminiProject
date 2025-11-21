@@ -253,6 +253,7 @@ export const Sidebar: React.FC = () => {
   const store = useStore();
   const t = translations[store.language];
   const setActiveModal = useStore(s => s.setActiveModal);
+  const logout = useStore(s => s.logout);
 
   const [contextMenu, setContextMenu] = useState<{
     type: 'session' | 'group';
@@ -325,6 +326,11 @@ export const Sidebar: React.FC = () => {
       const subject = `Agent Chat: ${session.title}`;
       const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
       window.open(mailtoLink, '_blank');
+  };
+
+  const handleSignOut = () => {
+    setShowUserMenu(false);
+    logout();
   };
 
   // Close context menu on global click
@@ -517,7 +523,7 @@ export const Sidebar: React.FC = () => {
                         <span>{t.settings}</span>
                     </button>
                     <div className="h-px bg-gray-100 my-1" />
-                    <button onClick={() => setShowUserMenu(false)} className="flex items-center gap-3 px-3 py-2 hover:bg-red-50 text-sm text-red-600 transition-colors">
+                    <button onClick={handleSignOut} className="flex items-center gap-3 px-3 py-2 hover:bg-red-50 text-sm text-red-600 transition-colors">
                         <Icons.LogOut className="w-4 h-4" />
                         <span>{t.signOut}</span>
                     </button>

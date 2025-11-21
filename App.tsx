@@ -8,6 +8,7 @@ import { MessageBubble } from './components/MessageBubble';
 import { TerminalPanel } from './components/TerminalPanel';
 import { NewsGrid } from './components/NewsGrid';
 import { UserModals } from './components/UserModals';
+import { LoginPage } from './components/LoginPage';
 import { Icons } from './components/icons';
 import { streamGeminiResponse } from './services/gemini';
 import { Role, Attachment } from './types';
@@ -16,6 +17,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { translations } from './locales';
 
 const App: React.FC = () => {
+  const isAuthenticated = useStore(s => s.isAuthenticated);
   const sessions = useStore(s => s.sessions);
   const currentSessionId = useStore(s => s.currentSessionId);
   const input = useStore(s => s.input);
@@ -51,16 +53,20 @@ const App: React.FC = () => {
   const t = translations[language];
 
   useEffect(() => {
-    fetchNews();
-    const interval = setInterval(() => {
-      fetchNews();
-    }, 6 * 60 * 60 * 1000); // Check every 6 hours
-    return () => clearInterval(interval);
-  }, []);
+    if (isAuthenticated) {
+        fetchNews();
+        const interval = setInterval(() => {
+        fetchNews();
+        }, 6 * 60 * 60 * 1000); // Check every 6 hours
+        return () => clearInterval(interval);
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages.length, currentSessionId]);
+    if (isAuthenticated) {
+        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages.length, currentSessionId, isAuthenticated]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -169,6 +175,10 @@ const App: React.FC = () => {
       }
     );
   };
+
+  if (!isAuthenticated) {
+    return <LoginPage />;
+  }
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-[#F3F4F6] text-gray-900 font-sans selection:bg-gray-300 selection:text-black">
