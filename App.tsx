@@ -12,6 +12,7 @@ import { LoginPage } from './components/LoginPage';
 import { Icons } from './components/icons';
 import { streamGeminiResponse } from './services/gemini';
 import { Role, Attachment } from './types';
+import { socketService } from './services/socket';
 import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import { translations } from './locales';
@@ -55,10 +56,18 @@ const App: React.FC = () => {
   useEffect(() => {
     if (isAuthenticated) {
         fetchNews();
+        
+        // Connect to WebSocket when authenticated
+        socketService.connect();
+
         const interval = setInterval(() => {
-        fetchNews();
+          fetchNews();
         }, 6 * 60 * 60 * 1000); // Check every 6 hours
-        return () => clearInterval(interval);
+        
+        return () => {
+          clearInterval(interval);
+          socketService.disconnect();
+        };
     }
   }, [isAuthenticated]);
 

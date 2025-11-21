@@ -11,8 +11,6 @@ interface ApiResponse<T> {
   data: T;
 }
 
-const BASE_URL = '/api/v1';
-
 /**
  * Base HTTP Request Method
  * 基础 HTTP 请求方法
@@ -21,33 +19,16 @@ const BASE_URL = '/api/v1';
  * @param options Fetch Options / Fetch 配置项
  * @returns Promise<T>
  */
-async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+async function request<T>(endpoint: string, options: RequestInit = {}, mockData?: T): Promise<T> {
   // Simulate network delay
   // 模拟网络延迟
   await new Promise(resolve => setTimeout(resolve, 800));
 
-  // Mock Response Logic (Replace with real fetch in production)
-  // 模拟响应逻辑 (生产环境中请替换为真实的 fetch 调用)
-  // const response = await fetch(`${BASE_URL}${endpoint}`, {
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //     ...options.headers,
-  //   },
-  //   ...options,
-  // });
-  // if (!response.ok) {
-  //   throw new Error(`HTTP Error: ${response.status}`);
-  // }
-  // return response.json();
-
   console.log(`[API] Request to ${endpoint}`, options);
 
-  // Return mock success
-  return {
-    code: 200,
-    message: 'Success',
-    data: {} as T
-  } as any; 
+  // Return mock data if provided, otherwise return a safe empty object cast as T
+  // 如果提供了模拟数据则返回，否则返回类型断言的安全空对象
+  return mockData as T;
 }
 
 export const authApi = {
@@ -62,28 +43,23 @@ export const authApi = {
    * @returns Promise<User>
    */
   login: async (credentials: LoginRequest): Promise<User> => {
-    // In a real app, this would be:
-    // return request<User>('/auth/login', {
-    //   method: 'POST',
-    //   body: JSON.stringify(credentials)
-    // });
-
-    // Mock Implementation
-    console.log('[API] Logging in with:', credentials.email || credentials.phone);
-    
-    await new Promise(resolve => setTimeout(resolve, 500));
-
+    // Simulate validation
     if (credentials.email && credentials.email.includes('error')) {
       throw new Error('Invalid credentials');
     }
 
-    return {
+    const mockUser: User = {
       id: 'user-123',
       name: 'Agent User',
       email: credentials.email || 'user@example.com',
       avatar: 'https://ui-avatars.com/api/?name=Agent+User',
       role: 'admin'
     };
+
+    return request<User>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials)
+    }, mockUser);
   },
 
   /**
@@ -96,7 +72,7 @@ export const authApi = {
   logout: async (): Promise<void> => {
     return request<void>('/auth/logout', {
       method: 'POST'
-    });
+    }, undefined);
   },
 
   /**
@@ -107,9 +83,17 @@ export const authApi = {
    * Path: /users/me
    */
   getProfile: async (): Promise<User> => {
+    const mockProfile: User = {
+      id: 'user-123',
+      name: 'Agent User',
+      email: 'user@example.com',
+      avatar: 'https://ui-avatars.com/api/?name=Agent+User',
+      role: 'admin'
+    };
+
     return request<User>('/users/me', {
       method: 'GET'
-    });
+    }, mockProfile);
   }
 };
 
@@ -125,7 +109,7 @@ export const chatApi = {
     return request('/chats', {
       method: 'POST',
       body: JSON.stringify({ title })
-    });
+    }, { id: 'new-session-id', title });
   },
 
   /**
@@ -136,6 +120,6 @@ export const chatApi = {
    * Path: /chats/{id}/messages
    */
   getMessages: async (sessionId: string) => {
-    return request(`/chats/${sessionId}/messages`);
+    return request(`/chats/${sessionId}/messages`, {}, []);
   }
 };

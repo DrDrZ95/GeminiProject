@@ -11,6 +11,7 @@ class WebSocketService {
   private socket: WebSocket | null = null;
   private url: string = 'ws://localhost:8080/ws';
   private listeners: Map<string, ((data: any) => void)[]> = new Map();
+  private connected: boolean = false;
 
   private constructor() {}
 
@@ -34,16 +35,23 @@ class WebSocketService {
   public connect(url?: string): void {
     if (url) this.url = url;
     
-    if (this.socket && (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)) {
-      console.warn('[WS] Already connected or connecting');
+    if (this.connected) {
+      console.warn('[WS] Already connected');
       return;
     }
 
     console.log(`[WS] Connecting to ${this.url}...`);
     
-    // In a real app, uncomment this. For demo, we just simulate.
+    // Simulation of connection for demo purposes
+    // 演示目的的连接模拟
+    setTimeout(() => {
+      this.connected = true;
+      this.onOpen(new Event('open'));
+    }, 500);
+
+    // Real implementation would be:
+    // 真实实现如下:
     // this.socket = new WebSocket(this.url);
-    
     // this.socket.onopen = this.onOpen.bind(this);
     // this.socket.onmessage = this.onMessage.bind(this);
     // this.socket.onclose = this.onClose.bind(this);
@@ -59,6 +67,8 @@ class WebSocketService {
       this.socket.close();
       this.socket = null;
     }
+    this.connected = false;
+    console.log('[WS] Disconnected manually');
   }
 
   /**
@@ -69,10 +79,11 @@ class WebSocketService {
    * @param payload Data Payload / 数据载荷
    */
   public send(event: string, payload: any): void {
-    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-      this.socket.send(JSON.stringify({ event, payload }));
+    if (this.connected) {
+      console.log(`[WS] Sending: ${event}`, payload);
+      // if (this.socket) this.socket.send(JSON.stringify({ event, payload }));
     } else {
-      // console.warn('[WS] Socket not connected, message ignored:', event);
+      console.warn('[WS] Socket not connected, message queued or ignored:', event);
     }
   }
 
@@ -103,10 +114,18 @@ class WebSocketService {
     this.listeners.set(event, filtered);
   }
 
+  /**
+   * Check Connection Status
+   * 检查连接状态
+   */
+  public isConnected(): boolean {
+    return this.connected;
+  }
+
   // Private Handlers
 
   private onOpen(event: Event) {
-    console.log('[WS] Connected');
+    console.log('[WS] Connection Established');
   }
 
   private onMessage(event: MessageEvent) {
@@ -124,6 +143,7 @@ class WebSocketService {
 
   private onClose(event: CloseEvent) {
     console.log('[WS] Disconnected', event.code);
+    this.connected = false;
   }
 
   private onError(event: Event) {
